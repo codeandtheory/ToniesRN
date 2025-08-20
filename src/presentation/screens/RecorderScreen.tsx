@@ -87,9 +87,8 @@ export default function RecorderScreen() {
       >
         {!isRecording ? (
           <TouchableOpacity
-            className={`h-[52px] rounded-[18px] items-center justify-center bg-[#D2000F] active:bg-red-800 ${
-              busy ? 'opacity-60' : ''
-            }`}
+            className={`h-[52px] rounded-[18px] items-center justify-center bg-[#D2000F] active:bg-red-800 ${busy ? 'opacity-60' : ''
+              }`}
             onPress={start}
             disabled={busy}
           >
