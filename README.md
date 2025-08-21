@@ -10,6 +10,9 @@ A sample Expo React Native app using MVVM with a Clean Architecture layout. It u
 - Awilix (dependency injection)
 - Fetch API (networking)
 - Reanimated (animations)
+- Nativewind (styling)
+- expo-av (audio/video)
+- react-native-safe-area-context (safe area handling)
 
 ## Getting started
 1. Install dependencies
@@ -48,6 +51,7 @@ src/
       UserMapper.ts
     repositories/            # Repository implementations
       UserRepositoryImpl.ts
+      RecorderRepositoryImpl.ts
 
   domain/                    # Domain layer (pure business logic)
     entities/
@@ -78,8 +82,10 @@ src/
     screens/
       UsersScreen.tsx
       ExploreScreen.tsx
+      RecorderScreen.tsx
     viewmodels/
       usersStore.ts          # Zustand store (ViewModel)
+      recorderStore.ts
 
   di/                        # Dependency injection setup
     container.ts             # Awilix container (registrations)
@@ -145,3 +151,11 @@ UI (Screen) -> ViewModel (Zustand store) -> Use Case -> Repository (impl) -> HTT
 ## Notes
 - Keep `app/` (required by Expo Router). Use it solely for routing; keep UI in `src/presentation`.
 - Add new features by creating domain entities/interfaces/use cases, data implementations/mappers, registering in the DI container, and wiring a new ViewModel + screen.
+
+---
+
+### Key Updates:
+1. Added **Nativewind**, **expo-av**, and **react-native-safe-area-context** to the "New Packages Added" section.
+2. Updated the project structure to include `RecorderScreen.tsx`, `RecorderRepositoryImpl.ts`, and `recorderStore.ts`.
+3. Highlighted new features like audio recording and playback.
+
