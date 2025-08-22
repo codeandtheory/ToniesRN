@@ -9,4 +9,9 @@ export interface RecorderRepository {
   save(tempUri: string, durationMs: number): Promise<RecordingItem>;
   list(): Promise<RecordingItem[]>;
   play(uri: string): Promise<void>;
+  pausePlayback(): Promise<void>;
+  resumePlayback(): Promise<void>;
+  stopPlayback(): Promise<void>;
+  seekPlayback(position: number): Promise<void>;
+  getPlaybackStatus(): Promise<{ isPlaying: boolean; position: number; duration: number }>;
 }

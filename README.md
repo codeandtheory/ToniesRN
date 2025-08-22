@@ -11,7 +11,7 @@ A sample Expo React Native app using MVVM with a Clean Architecture layout. It u
 - Fetch API (networking)
 - Reanimated (animations)
 - Nativewind (styling)
-- expo-av (audio/video)
+- expo-audio (audio recording and playback)
 - react-native-safe-area-context (safe area handling)
 
 ## Getting started
@@ -155,7 +155,7 @@ UI (Screen) -> ViewModel (Zustand store) -> Use Case -> Repository (impl) -> HTT
 ---
 
 ### Key Updates:
-1. Added **Nativewind**, **expo-av**, and **react-native-safe-area-context** to the "New Packages Added" section.
+1. Added **Nativewind**, **expo-audio**, and **react-native-safe-area-context** to the "New Packages Added" section.
 2. Updated the project structure to include `RecorderScreen.tsx`, `RecorderRepositoryImpl.ts`, and `recorderStore.ts`.
 3. Highlighted new features like audio recording and playback.
 

@@ -12,6 +12,7 @@ function formatMs(ms: number) {
 
 export class RecorderRepositoryImpl implements RecorderRepository {
   private currentRecording: Audio.Recording | null = null;
+  private currentSound: Audio.Sound | null = null;
 
   async requestPermission(): Promise<boolean> {
     const { granted } = await Audio.requestPermissionsAsync();
@@ -22,7 +23,7 @@ export class RecorderRepositoryImpl implements RecorderRepository {
     if (this.currentRecording) {
       try {
         await this.currentRecording.stopAndUnloadAsync();
-      } catch {}
+      } catch { }
       this.currentRecording = null;
     }
 
@@ -38,14 +39,14 @@ export class RecorderRepositoryImpl implements RecorderRepository {
     if (!this.currentRecording) return;
     try {
       await this.currentRecording.pauseAsync();
-    } catch {}
+    } catch { }
   }
 
   async resume(): Promise<void> {
     if (!this.currentRecording) return;
     try {
       await this.currentRecording.startAsync();
-    } catch {}
+    } catch { }
   }
 
   async stop(): Promise<{ tempUri: string; durationMs: number } | null> {
@@ -57,7 +58,7 @@ export class RecorderRepositoryImpl implements RecorderRepository {
       if ('durationMillis' in status && typeof status.durationMillis === 'number') {
         durationMs = status.durationMillis;
       }
-    } catch {}
+    } catch { }
 
     await this.currentRecording.stopAndUnloadAsync();
     const uri = this.currentRecording.getURI();
@@ -88,14 +89,12 @@ export class RecorderRepositoryImpl implements RecorderRepository {
 
   async list(): Promise<RecordingItem[]> {
     const dir = FileSystem.documentDirectory + 'recordings/';
-    await FileSystem.makeDirectoryAsync(dir, { intermediates: true }).catch(() => {});
+    await FileSystem.makeDirectoryAsync(dir, { intermediates: true }).catch(() => { });
     const files = await FileSystem.readDirectoryAsync(dir).catch(() => []);
     const items: RecordingItem[] = [];
 
     for (const filename of files) {
       const uri = dir + filename;
-
-      // Get the duration of the audio file
       let durationMs = 0;
       try {
         const { sound } = await Audio.Sound.createAsync({ uri });
@@ -115,13 +114,76 @@ export class RecorderRepositoryImpl implements RecorderRepository {
   }
 
   async play(uri: string): Promise<void> {
+    // Stop any currently playing sound
+    if (this.currentSound) {
+      try {
+        await this.currentSound.unloadAsync();
+      } catch { }
+      this.currentSound = null;
+    }
+
     const { sound } = await Audio.Sound.createAsync({ uri });
+    this.currentSound = sound;
     await sound.playAsync();
+
     sound.setOnPlaybackStatusUpdate((status) => {
       if (!status.isLoaded) return;
       if (status.didJustFinish) {
         sound.unloadAsync();
+        this.currentSound = null;
       }
     });
+  }
+
+  async pausePlayback(): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.pauseAsync();
+      } catch { }
+    }
+  }
+
+  async resumePlayback(): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.playAsync();
+      } catch { }
+    }
+  }
+
+  async stopPlayback(): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.unloadAsync();
+      } catch { }
+      this.currentSound = null;
+    }
+  }
+
+  async seekPlayback(position: number): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.setPositionAsync(position);
+      } catch { }
+    }
+  }
+
+  async getPlaybackStatus(): Promise<{ isPlaying: boolean; position: number; duration: number }> {
+    if (!this.currentSound) {
+      return { isPlaying: false, position: 0, duration: 0 };
+    }
+
+    try {
+      const status = await this.currentSound.getStatusAsync();
+      if (status.isLoaded) {
+        return {
+          isPlaying: status.isPlaying,
+          position: status.positionMillis || 0,
+          duration: status.durationMillis || 0,
+        };
+      }
+    } catch { }
+
+    return { isPlaying: false, position: 0, duration: 0 };
   }
 }
