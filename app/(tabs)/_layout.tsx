@@ -7,6 +7,7 @@ import { IconSymbol } from '@/src/presentation/components/ui/IconSymbol';
 import TabBarBackground from '@/src/presentation/components/ui/TabBarBackground';
 import { Colors } from '@/src/shared/constants/Colors';
 import { useColorScheme } from '@/src/presentation/hooks/useColorScheme';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -36,7 +37,7 @@ export default function TabLayout() {
         name="record"
         options={{
           title: 'Record',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mic.fill" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="mic" size={28} color={color} />,
         }}
       />
     </Tabs>
