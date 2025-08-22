@@ -6,6 +6,7 @@ import { useBottomTabOverflow } from '@/src/presentation/components/ui/TabBarBac
 import { useSeekBar } from '@/src/presentation/hooks/useSeekBar';
 import { SeekBar } from '@/src/presentation/components/SeekBar';
 import RecordingIcon from '@/assets/images/Recordings.png';
+import { Ionicons } from '@expo/vector-icons';
 import "../../../global.css";
 
 export default function RecorderScreen() {
@@ -96,9 +97,11 @@ export default function RecorderScreen() {
             onPress={isPlaying ? pausePlayback : resumePlayback}
             className="w-16 h-16 bg-[#D2000F] rounded-full items-center justify-center"
           >
-            <Text className="text-white text-2xl">
-              {isPlaying ? '⏸' : '▶'}
-            </Text>
+            {isPlaying ? (
+              <Ionicons name="pause" size={28} color="#FFFFFF" />
+            ) : (
+              <Ionicons name="play" size={28} color="#FFFFFF" />
+            )}
           </TouchableOpacity>
 
           {/* Stop Button */}
@@ -106,7 +109,7 @@ export default function RecorderScreen() {
             onPress={() => { stopPlayback(); setShowPlayer(false); }}
             className="w-12 h-12 bg-gray-600 rounded-full items-center justify-center"
           >
-            <Text className="text-white text-lg">⏹️</Text>
+            <Ionicons name="stop" size={28} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
