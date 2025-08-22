@@ -10,8 +10,8 @@ A sample Expo React Native app using MVVM with a Clean Architecture layout. It u
 - Awilix (dependency injection)
 - Fetch API (networking)
 - Reanimated (animations)
-- Nativewind (styling)
-- expo-audio (audio recording and playback)
+- NativeWind + Tailwind CSS (styling)
+- expo-av (audio recording and playback)
 - react-native-safe-area-context (safe area handling)
 
 ## Getting started
@@ -39,12 +39,11 @@ app/                         # Expo Router entry & route files (kept minimal)
   (tabs)/
     _layout.tsx
     index.tsx                # Exports UsersScreen
-    explore.tsx              # Exports ExploreScreen
 
 src/
   data/                      # Data layer (infrastructure)
     api/                     # HTTP client
-      ApiClient.ts          # fetch-based http<T>() helper
+      ApiClient.ts           # fetch-based http<T>() helper
     dtos/                    # Remote DTOs
       UserDto.ts
     mappers/                 # DTO <-> Domain mappers
@@ -56,10 +55,18 @@ src/
   domain/                    # Domain layer (pure business logic)
     entities/
       User.ts
+      RecordingItem.ts
     repositories/            # Repository contracts
       UserRepository.ts
+      RecorderRepository.ts
     usecases/
       GetUsersUseCase.ts
+      StartRecordingUseCase.ts
+      StopAndSaveRecordingUseCase.ts
+      ListRecordingsUseCase.ts
+      PlayRecordingUseCase.ts
+      PauseRecordingUseCase.ts
+      ResumeRecordingUseCase.ts
 
   presentation/              # Presentation layer (UI + ViewModels)
     components/
@@ -81,7 +88,6 @@ src/
       useThemeColor.ts
     screens/
       UsersScreen.tsx
-      ExploreScreen.tsx
       RecorderScreen.tsx
     viewmodels/
       usersStore.ts          # Zustand store (ViewModel)
@@ -98,6 +104,7 @@ expo-env.d.ts
 app.json
 package.json
 tsconfig.json
+tailwind.config.js
 ```
 
 ## Architecture overview
@@ -119,43 +126,52 @@ UI (Screen) -> ViewModel (Zustand store) -> Use Case -> Repository (impl) -> HTT
 
 ## Navigation
 - Uses Expo Router with file-based routing under `app/`
-- Route files are intentionally thin and export screens from `src/presentation/screens`
+- Route files are thin and export screens from `src/presentation/screens`
 - Main layout: `app/_layout.tsx`
 - Tabs layout: `app/(tabs)/_layout.tsx`
 
 ## Dependency Injection (Awilix)
 - Container: `src/di/container.ts`
 - Proxy injection with object-arg constructors
-  - Registers singletons for `userRepository` and `getUsersUseCase`
-  - Resolve in code: `container.resolve<GetUsersUseCase>('getUsersUseCase')`
+  - Registers singletons for repositories and use cases
+  - Example resolve: `container.resolve<GetUsersUseCase>('getUsersUseCase')`
 
 ## State management (Zustand)
 - Users ViewModel: `src/presentation/viewmodels/usersStore.ts`
-- Provides `users`, `isLoading`, `errorMessage`, and actions `loadUsers`, `refresh`, `clearError`
+- Recorder ViewModel: `src/presentation/viewmodels/recorderStore.ts`
+  - State: `items`, `isRecording`, `isPaused`, `isPreparing`, `isStopping`, `errorMessage`
+  - Actions: `load`, `start`, `pause`, `resume`, `stopAndSave`, `play`, `clearError`
 
 ## Networking (Fetch)
 - HTTP helper: `src/data/api/ApiClient.ts`
 - Base URL: `https://jsonplaceholder.typicode.com`
 - Repository: `src/data/repositories/UserRepositoryImpl.ts`
 
+## Audio (expo-av)
+- Recording and playback implemented in `src/data/repositories/RecorderRepositoryImpl.ts`
+- iOS permission: `NSMicrophoneUsageDescription` in `app.json`
+- Audio mode set with `Audio.setAudioModeAsync`
+- Filenames saved as: `Recording YYYY-MM-DD HH:MM:SS.m4a`
+
+## Styling (NativeWind + Tailwind)
+- Tailwind config: `tailwind.config.js`
+  - content: `['./app/**/*.{js,tsx,ts,jsx}', './src/**/**/*.{js,jsx,ts,tsx}']`
+  - presets: `[require('nativewind/preset')]`
+- Import styles in root layout: `import 'nativewind/css'`
+- Components/screens use `className` utility classes
+
 ## Path aliases
 - Configured in `tsconfig.json`:
-  - `@/*` -> project root (used as `@/src/...` throughout)
+  - `@/*` -> project root (used as `@/src/...`)
 
 ## Scripts
 - `npm start` / `npx expo start`: run Metro bundler and launch app
 - `npm run ios` / `npm run android` / `npm run web`: platform targets
 - `npm run lint`: run ESLint
-- `npm run reset-project`: reset example starter (provided by Expo template)
+- `npm run reset-project`: reset example starter
 
 ## Notes
-- Keep `app/` (required by Expo Router). Use it solely for routing; keep UI in `src/presentation`.
+- Keep `app/` (required by Expo Router). Use it only for routing; keep UI in `src/presentation`.
 - Add new features by creating domain entities/interfaces/use cases, data implementations/mappers, registering in the DI container, and wiring a new ViewModel + screen.
-
----
-
-### Key Updates:
-1. Added **Nativewind**, **expo-audio**, and **react-native-safe-area-context** to the "New Packages Added" section.
-2. Updated the project structure to include `RecorderScreen.tsx`, `RecorderRepositoryImpl.ts`, and `recorderStore.ts`.
-3. Highlighted new features like audio recording and playback.
+- On iOS Simulator: enable Features > Audio Input and grant microphone permissions in macOS System Settings if recording fails.
 
