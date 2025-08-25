@@ -1,4 +1,5 @@
 import type { RecordingItem } from '@/src/domain/entities/RecordingItem';
+import {AVPlaybackStatus} from "expo-av";
 
 export interface RecorderRepository {
   requestPermission(): Promise<boolean>;
@@ -8,10 +9,9 @@ export interface RecorderRepository {
   stop(): Promise<{ tempUri: string; durationMs: number } | null>;
   save(tempUri: string, durationMs: number): Promise<RecordingItem>;
   list(): Promise<RecordingItem[]>;
-  play(uri: string): Promise<void>;
+  play(uri: string, onPlaybackFinish?: (status: AVPlaybackStatus) => void): Promise<void>;
   pausePlayback(): Promise<void>;
   resumePlayback(): Promise<void>;
   stopPlayback(): Promise<void>;
   seekPlayback(position: number): Promise<void>;
-  getPlaybackStatus(): Promise<{ isPlaying: boolean; position: number; duration: number }>;
 }

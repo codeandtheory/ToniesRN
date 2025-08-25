@@ -9,7 +9,6 @@ import type {ResumeRecordingUseCase} from '@/src/domain/usecases/ResumeRecording
 import type {PausePlaybackUseCase} from '@/src/domain/usecases/PausePlaybackUseCase';
 import type {ResumePlaybackUseCase} from '@/src/domain/usecases/ResumePlaybackUseCase';
 import type {StopPlaybackUseCase} from '@/src/domain/usecases/StopPlaybackUseCase';
-import type {GetPlaybackStatusUseCase} from '@/src/domain/usecases/GetPlaybackStatusUseCase';
 import type {SeekPlaybackUseCase} from '@/src/domain/usecases/SeekPlaybackUseCase';
 import type {RecordingItem} from '@/src/domain/entities/RecordingItem';
 
@@ -48,11 +47,8 @@ export type RecorderActions = {
     resumePlayback: () => Promise<void>;
     stopPlayback: () => void;
     seekPlayback: (position: number) => void;
-    updatePlaybackStatus: () => Promise<void>;
     clearError: () => void;
 };
-
-let playbackStatusInterval: number | null = null;
 
 export const useRecorderStore = create<RecorderState & RecorderActions>((set, get) => ({
     isRecording: false,
@@ -146,7 +142,24 @@ export const useRecorderStore = create<RecorderState & RecorderActions>((set, ge
 
         try {
             const playRecordingUseCase = resolve<PlayRecordingUseCase>('playRecordingUseCase');
-            await playRecordingUseCase.execute(uri);
+            await playRecordingUseCase.execute(uri, (status) => {
+                if (!status.isLoaded) return;
+                if (status.didJustFinish) {
+                    set({
+                        isPlaying: false,
+                        isPausedPlayback: false,
+                        playingUri: null,
+                        playbackPosition: 0,
+                        playbackDuration: 0
+                    });
+                } else {
+                    set({
+                        isPlaying: status.isPlaying,
+                        playbackPosition: status.positionMillis,
+                        playbackDuration: status.durationMillis
+                    });
+                }
+            });
             set({
                 isPlaying: true,
                 isPausedPlayback: false,
@@ -155,18 +168,6 @@ export const useRecorderStore = create<RecorderState & RecorderActions>((set, ge
                 playbackDuration: 0
             });
 
-            // Start periodic status updates
-            if (playbackStatusInterval) clearInterval(playbackStatusInterval);
-
-            playbackStatusInterval = setInterval(async () => {
-                const {isPlaying, isPausedPlayback} = get();
-                if (!(isPlaying || isPausedPlayback)) {
-                    clearInterval(playbackStatusInterval!);
-                    playbackStatusInterval = null;
-                    return;
-                }
-                await get().updatePlaybackStatus();
-            }, 1000);
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Failed to play recording';
             set({errorMessage: msg});
@@ -207,7 +208,6 @@ export const useRecorderStore = create<RecorderState & RecorderActions>((set, ge
         try {
             const stopPlaybackUseCase = resolve<StopPlaybackUseCase>('stopPlaybackUseCase');
             await stopPlaybackUseCase.execute();
-            if (playbackStatusInterval) clearInterval(playbackStatusInterval);
         } catch (e) {
             const msg = e instanceof Error ? e.message : 'Failed to stop playback';
             set({errorMessage: msg});
@@ -233,31 +233,6 @@ export const useRecorderStore = create<RecorderState & RecorderActions>((set, ge
             }
         }
         set({playbackPosition: position});
-    },
-
-    updatePlaybackStatus: async () => {
-        try {
-            const getPlaybackStatusUseCase = resolve<GetPlaybackStatusUseCase>('getPlaybackStatusUseCase');
-            const status = await getPlaybackStatusUseCase.execute();
-            set({
-                isPlaying: status.isPlaying,
-                playbackPosition: status.position,
-                playbackDuration: status.duration
-            });
-
-            // If playback finished (not just paused), reset state
-            if (!status.isPlaying && get().isPlaying && !get().isPausedPlayback) {
-                set({
-                    isPlaying: false,
-                    isPausedPlayback: false,
-                    playingUri: null,
-                    playbackPosition: 0,
-                    playbackDuration: 0
-                });
-            }
-        } catch (e: unknown) {
-            // Silently handle errors in status updates
-        }
     },
 
     clearError: () => set({errorMessage: null}),

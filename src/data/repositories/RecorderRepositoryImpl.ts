@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import {Audio, AVPlaybackStatus} from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import type { RecorderRepository } from '@/src/domain/repositories/RecorderRepository';
 import type { RecordingItem } from '@/src/domain/entities/RecordingItem';
@@ -113,12 +113,12 @@ export class RecorderRepositoryImpl implements RecorderRepository {
     return items;
   }
 
-  async play(uri: string): Promise<void> {
+  async play(uri: string, onPlaybackStatusUpdate?: (status: AVPlaybackStatus) => void): Promise<void> {
     // Stop any currently playing sound
     if (this.currentSound) {
       try {
         await this.currentSound.unloadAsync();
-      } catch { }
+      } catch {}
       this.currentSound = null;
     }
 
@@ -128,6 +128,9 @@ export class RecorderRepositoryImpl implements RecorderRepository {
 
     sound.setOnPlaybackStatusUpdate((status) => {
       if (!status.isLoaded) return;
+      if (onPlaybackStatusUpdate) {
+        onPlaybackStatusUpdate(status); // Send the playback status to the callback
+      }
       if (status.didJustFinish) {
         sound.unloadAsync();
         this.currentSound = null;
@@ -166,24 +169,5 @@ export class RecorderRepositoryImpl implements RecorderRepository {
         await this.currentSound.setPositionAsync(position);
       } catch { }
     }
-  }
-
-  async getPlaybackStatus(): Promise<{ isPlaying: boolean; position: number; duration: number }> {
-    if (!this.currentSound) {
-      return { isPlaying: false, position: 0, duration: 0 };
-    }
-
-    try {
-      const status = await this.currentSound.getStatusAsync();
-      if (status.isLoaded) {
-        return {
-          isPlaying: status.isPlaying,
-          position: status.positionMillis || 0,
-          duration: status.durationMillis || 0,
-        };
-      }
-    } catch { }
-
-    return { isPlaying: false, position: 0, duration: 0 };
   }
 }

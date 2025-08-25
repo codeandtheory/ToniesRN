@@ -11,7 +11,6 @@ import { ResumeRecordingUseCase } from '@/src/domain/usecases/ResumeRecordingUse
 import { PausePlaybackUseCase } from '@/src/domain/usecases/PausePlaybackUseCase';
 import { ResumePlaybackUseCase } from '@/src/domain/usecases/ResumePlaybackUseCase';
 import { StopPlaybackUseCase } from '@/src/domain/usecases/StopPlaybackUseCase';
-import { GetPlaybackStatusUseCase } from '@/src/domain/usecases/GetPlaybackStatusUseCase';
 import { SeekPlaybackUseCase } from '@/src/domain/usecases/SeekPlaybackUseCase';
 
 export type AppContainer = AwilixContainer;
@@ -31,6 +30,5 @@ container.register({
   pausePlaybackUseCase: asClass(PausePlaybackUseCase).singleton(),
   resumePlaybackUseCase: asClass(ResumePlaybackUseCase).singleton(),
   stopPlaybackUseCase: asClass(StopPlaybackUseCase).singleton(),
-  getPlaybackStatusUseCase: asClass(GetPlaybackStatusUseCase).singleton(),
   seekPlaybackUseCase: asClass(SeekPlaybackUseCase).singleton(),
 }); 
