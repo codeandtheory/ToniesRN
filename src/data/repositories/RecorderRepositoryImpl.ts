@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import {Audio, AVPlaybackStatus} from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import type { RecorderRepository } from '@/src/domain/repositories/RecorderRepository';
 import type { RecordingItem } from '@/src/domain/entities/RecordingItem';
@@ -12,6 +12,7 @@ function formatMs(ms: number) {
 
 export class RecorderRepositoryImpl implements RecorderRepository {
   private currentRecording: Audio.Recording | null = null;
+  private currentSound: Audio.Sound | null = null;
 
   async requestPermission(): Promise<boolean> {
     const { granted } = await Audio.requestPermissionsAsync();
@@ -22,7 +23,7 @@ export class RecorderRepositoryImpl implements RecorderRepository {
     if (this.currentRecording) {
       try {
         await this.currentRecording.stopAndUnloadAsync();
-      } catch {}
+      } catch { }
       this.currentRecording = null;
     }
 
@@ -38,14 +39,14 @@ export class RecorderRepositoryImpl implements RecorderRepository {
     if (!this.currentRecording) return;
     try {
       await this.currentRecording.pauseAsync();
-    } catch {}
+    } catch { }
   }
 
   async resume(): Promise<void> {
     if (!this.currentRecording) return;
     try {
       await this.currentRecording.startAsync();
-    } catch {}
+    } catch { }
   }
 
   async stop(): Promise<{ tempUri: string; durationMs: number } | null> {
@@ -57,7 +58,7 @@ export class RecorderRepositoryImpl implements RecorderRepository {
       if ('durationMillis' in status && typeof status.durationMillis === 'number') {
         durationMs = status.durationMillis;
       }
-    } catch {}
+    } catch { }
 
     await this.currentRecording.stopAndUnloadAsync();
     const uri = this.currentRecording.getURI();
@@ -88,14 +89,12 @@ export class RecorderRepositoryImpl implements RecorderRepository {
 
   async list(): Promise<RecordingItem[]> {
     const dir = FileSystem.documentDirectory + 'recordings/';
-    await FileSystem.makeDirectoryAsync(dir, { intermediates: true }).catch(() => {});
+    await FileSystem.makeDirectoryAsync(dir, { intermediates: true }).catch(() => { });
     const files = await FileSystem.readDirectoryAsync(dir).catch(() => []);
     const items: RecordingItem[] = [];
 
     for (const filename of files) {
       const uri = dir + filename;
-
-      // Get the duration of the audio file
       let durationMs = 0;
       try {
         const { sound } = await Audio.Sound.createAsync({ uri });
@@ -114,14 +113,61 @@ export class RecorderRepositoryImpl implements RecorderRepository {
     return items;
   }
 
-  async play(uri: string): Promise<void> {
+  async play(uri: string, onPlaybackStatusUpdate?: (status: AVPlaybackStatus) => void): Promise<void> {
+    // Stop any currently playing sound
+    if (this.currentSound) {
+      try {
+        await this.currentSound.unloadAsync();
+      } catch {}
+      this.currentSound = null;
+    }
+
     const { sound } = await Audio.Sound.createAsync({ uri });
+    this.currentSound = sound;
     await sound.playAsync();
+
     sound.setOnPlaybackStatusUpdate((status) => {
       if (!status.isLoaded) return;
+      if (onPlaybackStatusUpdate) {
+        onPlaybackStatusUpdate(status); // Send the playback status to the callback
+      }
       if (status.didJustFinish) {
         sound.unloadAsync();
+        this.currentSound = null;
       }
     });
+  }
+
+  async pausePlayback(): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.pauseAsync();
+      } catch { }
+    }
+  }
+
+  async resumePlayback(): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.playAsync();
+      } catch { }
+    }
+  }
+
+  async stopPlayback(): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.unloadAsync();
+      } catch { }
+      this.currentSound = null;
+    }
+  }
+
+  async seekPlayback(position: number): Promise<void> {
+    if (this.currentSound) {
+      try {
+        await this.currentSound.setPositionAsync(position);
+      } catch { }
+    }
   }
 }

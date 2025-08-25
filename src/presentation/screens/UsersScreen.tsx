@@ -1,9 +1,9 @@
 import { useEffect, useCallback } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
 
-import { ThemedText } from '@/src/presentation/components/ThemedText';
-import { ThemedView } from '@/src/presentation/components/ThemedView';
 import { useUsersStore } from '@/src/presentation/viewmodels/usersStore';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import "../../../global.css";
 
 export default function UsersScreen() {
   const users = useUsersStore((s) => s.users);
@@ -18,73 +18,41 @@ export default function UsersScreen() {
   }, [loadUsers]);
 
   const renderItem = useCallback(({ item }: { item: { id: number; name: string; email: string } }) => (
-    <View style={styles.card}>
-      <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
-      <ThemedText>{item.email}</ThemedText>
+    <View className="p-3 rounded-lg border border-gray-200 bg-gray-50 mb-2">
+      <Text className="text-gray-800 font-semibold">{item.name}</Text>
+      <Text className="text-gray-600">{item.email}</Text>
     </View>
   ), []);
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Users</ThemedText>
+    <SafeAreaView className="flex-1 bg-[#F4F1ED] p-4">
+      <View className="flex-1 gap-3">
+        <Text className="text-2xl font-bold text-gray-900">Users</Text>
 
-      {errorMessage ? (
-        <View style={styles.errorContainer}>
-          <ThemedText style={styles.errorText}>{errorMessage}</ThemedText>
-          <ThemedText type="link" onPress={() => { clearError(); loadUsers(); }}>Retry</ThemedText>
-        </View>
-      ) : null}
+        {errorMessage ? (
+          <View className="p-3 rounded-lg bg-red-100">
+            <Text className="text-gray-800 mb-1">{errorMessage}</Text>
+            <Text className="text-blue-600 underline" onPress={() => { clearError(); loadUsers(); }}>Retry</Text>
+          </View>
+        ) : null}
 
-      {isLoading && users.length === 0 ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator />
-        </View>
-      ) : (
-        <FlatList
-          data={users}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderItem}
-          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
-          contentContainerStyle={users.length === 0 ? styles.emptyList : undefined}
-          ListEmptyComponent={!isLoading ? (
-            <ThemedText>No users found.</ThemedText>
-          ) : null}
-        />
-      )}
-    </ThemedView>
+        {isLoading && users.length === 0 ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator />
+          </View>
+        ) : (
+          <FlatList
+            data={users}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={renderItem}
+            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
+            contentContainerStyle={users.length === 0 ? { flexGrow: 1, alignItems: 'center', justifyContent: 'center' } : undefined}
+            ListEmptyComponent={!isLoading ? (
+              <Text className="text-gray-600">No users found.</Text>
+            ) : null}
+          />
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    gap: 12,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  errorContainer: {
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 0, 0, 0.08)',
-  },
-  errorText: {
-    marginBottom: 6,
-  },
-  emptyList: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  card: {
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(0,0,0,0.1)',
-    backgroundColor: 'rgba(0,0,0,0.02)',
-    marginBottom: 8,
-  },
-}); 
