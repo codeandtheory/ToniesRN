@@ -1,8 +1,6 @@
 import { useEffect, useCallback } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
 
-import { ThemedText } from '@/src/presentation/components/ThemedText';
-import { ThemedView } from '@/src/presentation/components/ThemedView';
 import { useUsersStore } from '@/src/presentation/viewmodels/usersStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import "../../../global.css";
@@ -20,21 +18,21 @@ export default function UsersScreen() {
   }, [loadUsers]);
 
   const renderItem = useCallback(({ item }: { item: { id: number; name: string; email: string } }) => (
-    <View className="p-3 rounded-xl border border-gray-200 bg-gray-50 mb-2">
-      <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
-      <ThemedText>{item.email}</ThemedText>
+    <View className="p-3 rounded-lg border border-gray-200 bg-gray-50 mb-2">
+      <Text className="text-gray-800 font-semibold">{item.name}</Text>
+      <Text className="text-gray-600">{item.email}</Text>
     </View>
   ), []);
 
   return (
     <SafeAreaView className="flex-1 bg-[#F4F1ED] p-4">
-      <View className="flex-1 gap-3 ">
-        <ThemedText type="title">Users</ThemedText>
+      <View className="flex-1 gap-3">
+        <Text className="text-2xl font-bold text-gray-900">Users</Text>
 
         {errorMessage ? (
           <View className="p-3 rounded-lg bg-red-100">
-            <ThemedText className="mb-1">{errorMessage}</ThemedText>
-            <ThemedText type="link" onPress={() => { clearError(); loadUsers(); }}>Retry</ThemedText>
+            <Text className="text-gray-800 mb-1">{errorMessage}</Text>
+            <Text className="text-blue-600 underline" onPress={() => { clearError(); loadUsers(); }}>Retry</Text>
           </View>
         ) : null}
 
@@ -50,7 +48,7 @@ export default function UsersScreen() {
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
             contentContainerStyle={users.length === 0 ? { flexGrow: 1, alignItems: 'center', justifyContent: 'center' } : undefined}
             ListEmptyComponent={!isLoading ? (
-              <ThemedText>No users found.</ThemedText>
+              <Text className="text-gray-600">No users found.</Text>
             ) : null}
           />
         )}
