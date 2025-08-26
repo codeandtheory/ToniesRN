@@ -8,16 +8,18 @@ import { ListRecordingsUseCase } from '@/src/domain/usecases/ListRecordingsUseCa
 import { PlayRecordingUseCase } from '@/src/domain/usecases/PlayRecordingUseCase';
 import { PauseRecordingUseCase } from '@/src/domain/usecases/PauseRecordingUseCase';
 import { ResumeRecordingUseCase } from '@/src/domain/usecases/ResumeRecordingUseCase';
+import { PausePlaybackUseCase } from '@/src/domain/usecases/PausePlaybackUseCase';
+import { ResumePlaybackUseCase } from '@/src/domain/usecases/ResumePlaybackUseCase';
+import { StopPlaybackUseCase } from '@/src/domain/usecases/StopPlaybackUseCase';
+import { SeekPlaybackUseCase } from '@/src/domain/usecases/SeekPlaybackUseCase';
 
 export type AppContainer = AwilixContainer;
 
 export const container: AppContainer = createContainer({ injectionMode: InjectionMode.PROXY });
 
-// Register classes as singletons
 container.register({
   userRepository: asClass(UserRepositoryImpl).singleton(),
   getUsersUseCase: asClass(GetUsersUseCase).singleton(),
-
   recorderRepository: asClass(RecorderRepositoryImpl).singleton(),
   startRecordingUseCase: asClass(StartRecordingUseCase).singleton(),
   stopAndSaveRecordingUseCase: asClass(StopAndSaveRecordingUseCase).singleton(),
@@ -25,4 +27,8 @@ container.register({
   playRecordingUseCase: asClass(PlayRecordingUseCase).singleton(),
   pauseRecordingUseCase: asClass(PauseRecordingUseCase).singleton(),
   resumeRecordingUseCase: asClass(ResumeRecordingUseCase).singleton(),
+  pausePlaybackUseCase: asClass(PausePlaybackUseCase).singleton(),
+  resumePlaybackUseCase: asClass(ResumePlaybackUseCase).singleton(),
+  stopPlaybackUseCase: asClass(StopPlaybackUseCase).singleton(),
+  seekPlaybackUseCase: asClass(SeekPlaybackUseCase).singleton(),
 }); 

@@ -1,4 +1,5 @@
 import type { RecorderRepository } from '@/src/domain/repositories/RecorderRepository';
+import {AVPlaybackStatus} from "expo-av";
 
 export type PlayRecordingDeps = { recorderRepository: RecorderRepository };
 
@@ -7,7 +8,7 @@ export class PlayRecordingUseCase {
   constructor({ recorderRepository }: PlayRecordingDeps) {
     this.repo = recorderRepository;
   }
-  async execute(uri: string): Promise<void> {
-    return this.repo.play(uri);
+  async execute(uri: string, onPlaybackFinish?: (status: AVPlaybackStatus) => void): Promise<void> {
+    return this.repo.play(uri, onPlaybackFinish);
   }
 }
