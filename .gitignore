@@ -39,6 +39,7 @@ android/.idea/
 *.jks
 
 # iOS
+ios
 ios/Pods/
 ios/build/
 ios/DerivedData/

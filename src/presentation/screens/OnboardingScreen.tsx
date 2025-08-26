@@ -17,7 +17,6 @@ export default function ProfileFormScreen() {
 
     const handleConfirm = () => {
         console.log({ name, gender, dob });
-        // Handle form submission
     };
 
     return (
