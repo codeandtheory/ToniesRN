@@ -1,16 +1,13 @@
-// app/(tabs)/ProfileForm.tsx
 import React, { useState } from 'react';
 import {
     View,
     Text,
     TouchableOpacity,
-    Button,
-    StyleSheet,
-    Platform,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ScrollView } from 'react-native-gesture-handler';
 import { TextInput } from 'react-native-paper';
+import "../../../global.css";
 
 export default function ProfileFormScreen() {
     const [name, setName] = useState('');
@@ -24,8 +21,8 @@ export default function ProfileFormScreen() {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.label}>Name</Text>
+        <ScrollView className="p-5 pb-10 flex-grow bg-white">
+            <Text className="mb-1 font-semibold mt-12">Name</Text>
             <TextInput
                 label="Name"
                 value={name}
@@ -33,34 +30,36 @@ export default function ProfileFormScreen() {
                 mode="outlined"
             />
 
-            <View style={styles.genderContainer}>
+            <View className="flex-row justify-around mb-4 mt-8">
                 {['boy', 'girl', 'na'].map((g) => (
                     <TouchableOpacity
                         key={g}
-                        style={[
-                            styles.genderButton,
-                            gender === g && styles.genderButtonSelected,
-                        ]}
+                        className={`p-2 rounded-full border min-w-[90px] items-center ${
+                            gender === g ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                        }`}
                         onPress={() => setGender(g as typeof gender)}
                     >
                         <Text
-                            style={[
-                                styles.genderText,
-                                gender === g && styles.genderTextSelected,
-                            ]}
+                            className={`${
+                                gender === g ? 'text-white font-bold' : 'text-black'
+                            }`}
                         >
+
                             {g === 'boy'
                                 ? 'Boy'
                                 : g === 'girl'
-                                    ? 'Girl'
-                                    : 'Rather not say'}
+                                ? 'Girl'
+                                : 'Rather not say'}
                         </Text>
                     </TouchableOpacity>
                 ))}
             </View>
 
-            <Text style={styles.label}>Date of Birth</Text>
-            <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.dateInput}>
+            <Text className="mb-1 font-semibold">Date of Birth</Text>
+            <TouchableOpacity
+                onPress={() => setShowPicker(true)}
+                className="p-3 rounded-lg border border-gray-300 mb-4"
+            >
                 <Text>{dob ? dob.toDateString() : 'Select date'}</Text>
             </TouchableOpacity>
 
@@ -68,7 +67,7 @@ export default function ProfileFormScreen() {
                 <DateTimePicker
                     value={dob || new Date()}
                     mode="date"
-                    display='spinner'
+                    display="spinner"
                     onChange={(event, selectedDate) => {
                         setShowPicker(false);
                         if (selectedDate) {
@@ -78,75 +77,12 @@ export default function ProfileFormScreen() {
                 />
             )}
 
-            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-                <Text style={styles.confirmButtonText}>Continue</Text>
+            <TouchableOpacity
+                className="bg-red-500 py-4 rounded-full items-center mt-auto"
+                onPress={handleConfirm}
+            >
+                <Text className="text-white text-lg font-bold">Continue</Text>
             </TouchableOpacity>
         </ScrollView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        padding: 20,
-        paddingBottom: 40,
-        flexGrow: 1,
-        backgroundColor: '#fff',
-    },
-    label: {
-        marginBottom: 6,
-        fontWeight: '600',
-        marginTop: 50
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 16,
-    },
-    genderContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 16,
-        marginTop: 30
-    },
-    genderButton: {
-        padding: 10,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        minWidth: 90,
-        alignItems: 'center',
-    },
-    genderButtonSelected: {
-        backgroundColor: '#007AFF',
-        borderColor: '#007AFF',
-    },
-    genderText: {
-        color: '#000',
-    },
-    genderTextSelected: {
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-    dateInput: {
-        padding: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        marginBottom: 16,
-    },
-    confirmButton: {
-        backgroundColor: 'red',
-        paddingVertical: 14,
-        borderRadius: 25,
-        alignItems: 'center',
-        marginTop: "auto",
-    },
-
-    confirmButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-});
