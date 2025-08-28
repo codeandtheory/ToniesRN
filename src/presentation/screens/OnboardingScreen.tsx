@@ -11,16 +11,18 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ScrollView } from 'react-native-gesture-handler';
 import { TextInput } from 'react-native-paper';
+import { useOnboardingStore } from '@/src/presentation/viewmodels/onboardingStore';
 
 export default function ProfileFormScreen() {
     const [name, setName] = useState('');
     const [gender, setGender] = useState<'boy' | 'girl' | 'na' | null>(null);
     const [dob, setDob] = useState<Date | null>(null);
     const [showPicker, setShowPicker] = useState(false);
+    const save = useOnboardingStore((s) => s.save);
 
-    const handleConfirm = () => {
-        console.log({ name, gender, dob });
-        // Handle form submission
+    const handleConfirm = async () => {
+        useOnboardingStore.setState({ name, gender, dob });
+        await save();
     };
 
     return (
@@ -69,7 +71,7 @@ export default function ProfileFormScreen() {
                     value={dob || new Date()}
                     mode="date"
                     display='spinner'
-                    onChange={(event, selectedDate) => {
+                    onChange={(_event: unknown, selectedDate?: Date | undefined) => {
                         setShowPicker(false);
                         if (selectedDate) {
                             setDob(selectedDate);

@@ -4,9 +4,11 @@ import { Stack } from 'expo-router';
 import 'expo-router/entry';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { useEffect, useState } from 'react';
 
 import { useColorScheme } from '@/src/presentation/hooks/useColorScheme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import '@/src/di/providers';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -18,15 +20,17 @@ export default function RootLayout() {
     return null;
   }
 
+  // Navigation guard moved to app/index.tsx via <Redirect/>
+
   return (
     <GestureHandlerRootView >
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }

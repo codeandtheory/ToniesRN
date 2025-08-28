@@ -12,6 +12,9 @@ import { PausePlaybackUseCase } from '@/src/domain/usecases/PausePlaybackUseCase
 import { ResumePlaybackUseCase } from '@/src/domain/usecases/ResumePlaybackUseCase';
 import { StopPlaybackUseCase } from '@/src/domain/usecases/StopPlaybackUseCase';
 import { SeekPlaybackUseCase } from '@/src/domain/usecases/SeekPlaybackUseCase';
+import { LocalUserRepositoryImpl } from '@/src/data/repositories/LocalUserRepositoryImpl';
+import { SaveLocalUserUseCase } from '@/src/domain/usecases/SaveLocalUserUseCase';
+import { GetLocalUserUseCase } from '@/src/domain/usecases/GetLocalUserUseCase';
 
 export type AppContainer = AwilixContainer;
 
@@ -20,6 +23,9 @@ export const container: AppContainer = createContainer({ injectionMode: Injectio
 container.register({
   userRepository: asClass(UserRepositoryImpl).singleton(),
   getUsersUseCase: asClass(GetUsersUseCase).singleton(),
+  localUserRepository: asClass(LocalUserRepositoryImpl).singleton(),
+  saveLocalUserUseCase: asClass(SaveLocalUserUseCase).singleton(),
+  getLocalUserUseCase: asClass(GetLocalUserUseCase).singleton(),
   recorderRepository: asClass(RecorderRepositoryImpl).singleton(),
   startRecordingUseCase: asClass(StartRecordingUseCase).singleton(),
   stopAndSaveRecordingUseCase: asClass(StopAndSaveRecordingUseCase).singleton(),
