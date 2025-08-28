@@ -44,7 +44,7 @@ export default function TabLayout() {
         name="onboarding"
         options={{
           title: 'Onboarding',
-          tabBarIcon: ({ color }) => <Ionicons name="person-remove-outline" size={28} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="person" size={28} color={color} />,
         }}
       />
     </Tabs>
