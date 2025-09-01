@@ -4,6 +4,7 @@ import {
     View,
     Text,
     TouchableOpacity,
+    Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -11,6 +12,7 @@ import { TextInput } from 'react-native-paper';
 import "../../../global.css";
 import { useLocalUsersStore } from '../viewmodels/onboardingStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {router} from 'expo-router'
 
 export default function ProfileFormScreen() {
 
@@ -22,9 +24,9 @@ export default function ProfileFormScreen() {
     const refresh = useLocalUsersStore((s) => s.refresh);
     const clearError = useLocalUsersStore((s) => s.clearError);
 
-    useEffect(() => {
-        loadUsers();
-    }, [loadUsers]);
+    // useEffect(() => {
+    //     loadUsers();
+    // }, [loadUsers]);
 
 
     const [name, setName] = useState('');
@@ -32,11 +34,12 @@ export default function ProfileFormScreen() {
     const [dob, setDob] = useState<Date | null>(null);
     const [showPicker, setShowPicker] = useState(false);
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         console.log({ name, gender, dob });
         if (name != "" && gender != null && dob != null) {
             console.log("inside");
-            storeUser(name, gender, dob.getTime())
+            const result = await storeUser(name, gender, dob.getTime());
+            result ? router.back() : Alert.alert("Error", "Error saving details. Please try again");
         }
     };
 
@@ -44,7 +47,7 @@ export default function ProfileFormScreen() {
         <SafeAreaView>
             <ScrollView className="p-5 pb-10 flex-grow bg-white">
 
-                {users ? (
+                {/* {users ? (
                     <>
                         <View className="bg-blue-400 p-5 rounded-2xl shadow-sm mb-6">
                             <Text className="text-xl font-bold text-black mb-2">Profile</Text>
@@ -69,7 +72,7 @@ export default function ProfileFormScreen() {
                             </View>
                         </View>
                     </>
-                ) : (
+                ) : ( */}
                     <>
                         <TextInput
                             label="Name"
@@ -130,8 +133,7 @@ export default function ProfileFormScreen() {
                         </TouchableOpacity>
 
                     </>
-                )
-                }
+                {/* )7 */}
             </ScrollView>
         </SafeAreaView>
     );
