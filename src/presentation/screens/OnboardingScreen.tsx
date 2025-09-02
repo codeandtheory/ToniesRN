@@ -43,33 +43,6 @@ export default function ProfileFormScreen() {
     return (
         <SafeAreaView>
             <ScrollView className="p-5 pb-10 flex-grow bg-white">
-
-                {/* {users ? (
-                    <>
-                        <View className="bg-blue-400 p-5 rounded-2xl shadow-sm mb-6">
-                            <Text className="text-xl font-bold text-black mb-2">Profile</Text>
-
-                            <View className="mb-3">
-                                <Text className="text-gray-100 text-sm">Name</Text>
-                                <Text className="text-lg text-black font-bold capitalize">{users.name}</Text>
-                            </View>
-
-                            <View className="mb-3">
-                                <Text className="text-gray-100 text-sm">Gender</Text>
-                                <Text className="text-lg text-black font-bold capitalize">
-                                    {users.gender}
-                                </Text>
-                            </View>
-
-                            <View>
-                                <Text className="text-gray-100 text-sm">Date of Birth</Text>
-                                <Text className="text-lg text-black font-bold capitalize">
-                                    {new Date(users.dob).toDateString()}
-                                </Text>
-                            </View>
-                        </View>
-                    </>
-                ) : ( */}
                     <>
                         <TextInput
                             label="Name"
