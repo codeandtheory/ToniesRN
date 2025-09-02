@@ -13,7 +13,7 @@ export type LocalUserViewState = {
 
 export type UsersViewActions = {
   loadUsers: () => Promise<void>;
-  storeUser: (name: string, gender: string, dob: number) => Promise<void>;
+  storeUser: (name: string, gender: string, dob: number) => Promise<Boolean>;
   refresh: () => Promise<void>;
   clearError: () => void;
 };
@@ -51,9 +51,11 @@ export const useLocalUsersStore = create<LocalUserViewState & UsersViewActions>(
     console.log( "inside try ",  localUser );
       const user = await localUserUseCase.store(localUser);
       set({ user: localUser, isLoading: false, errorMessage: null });
+      return true;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to save user';
       set({ errorMessage: message, isLoading: false });
+      return false;
     }
   },
 

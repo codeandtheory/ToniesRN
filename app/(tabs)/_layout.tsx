@@ -41,12 +41,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="onboarding"
+        name="profile"
         options={{
-          title: 'Onboarding',
+          title: 'Profile',
           tabBarIcon: ({ color }) => <Ionicons name="person" size={28} color={color} />,
         }}
       />
     </Tabs>
+    
+
   );
 }

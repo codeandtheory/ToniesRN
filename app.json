@@ -12,14 +12,16 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs microphone access to record audio."
-      }
+      },
+      "bundleIdentifier": "com.anonymous.ToniesApp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.ToniesApp"
     },
     "web": {
       "bundler": "metro",
@@ -41,6 +43,9 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "updates": {
+      "enabled": false
     }
   }
 }
