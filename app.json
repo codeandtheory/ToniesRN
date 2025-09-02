@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs microphone access to record audio."
-      }
+      },
+      "bundleIdentifier": "com.anonymous.ToniesApp"
     },
     "android": {
       "adaptiveIcon": {
