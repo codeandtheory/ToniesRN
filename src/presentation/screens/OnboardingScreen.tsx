@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import { useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -13,6 +11,9 @@ import "../../../global.css";
 import { useLocalUsersStore } from '../viewmodels/onboardingStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {router} from 'expo-router'
+import { useFormReducer } from '../hooks/useFormReducer';
+
+
 
 export default function ProfileFormScreen() {
 
@@ -27,18 +28,14 @@ export default function ProfileFormScreen() {
     // useEffect(() => {
     //     loadUsers();
     // }, [loadUsers]);
-
-
-    const [name, setName] = useState('');
-    const [gender, setGender] = useState<'boy' | 'girl' | 'na' | null>(null);
-    const [dob, setDob] = useState<Date | null>(null);
-    const [showPicker, setShowPicker] = useState(false);
+    
+    const [userState, dispatch] = useFormReducer();
 
     const handleConfirm = async () => {
-        console.log({ name, gender, dob });
-        if (name != "" && gender != null && dob != null) {
+        console.log({ name: userState.name, gender: userState.gender, dob: userState.dob });
+        if (userState.name != "" && userState.gender != null && userState.dob != null) {
             console.log("inside");
-            const result = await storeUser(name, gender, dob.getTime());
+            const result = await storeUser(userState.name, userState.gender, userState.dob.getTime());
             result ? router.back() : Alert.alert("Error", "Error saving details. Please try again");
         }
     };
@@ -76,20 +73,20 @@ export default function ProfileFormScreen() {
                     <>
                         <TextInput
                             label="Name"
-                            value={name}
-                            onChangeText={setName}
+                            value={userState.name}
+                            onChangeText={(text) => dispatch({type: "setName", payLoad:text})}
                             mode="outlined"
                         />
                         <View className="flex-row justify-around mb-4 mt-8">
                             {['boy', 'girl', 'na'].map((g) => (
                                 <TouchableOpacity
                                     key={g}
-                                    className={`p-2 rounded-full border min-w-[90px] items-center ${gender === g ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+                                    className={`p-2 rounded-full border min-w-[90px] items-center ${userState.gender === g ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
                                         }`}
-                                    onPress={() => setGender(g as typeof gender)}
+                                    onPress={() => {dispatch({type: "setGender", payLoad: g})}}
                                 >
                                     <Text
-                                        className={`${gender === g ? 'text-white font-bold' : 'text-black'
+                                        className={`${userState.gender === g ? 'text-white font-bold' : 'text-black'
                                             }`}
                                     >
 
@@ -105,21 +102,21 @@ export default function ProfileFormScreen() {
 
                         <Text className="mb-1 font-semibold">Date of Birth</Text>
                         <TouchableOpacity
-                            onPress={() => setShowPicker(true)}
+                            onPress={() => dispatch({type: 'showPicker', payLoad: true})}
                             className="p-3 rounded-lg border border-gray-300 mb-4"
                         >
-                            <Text>{dob ? dob.toDateString() : 'Select date'}</Text>
+                            <Text>{userState.dob ? userState.dob.toDateString() : 'Select date'}</Text>
                         </TouchableOpacity>
 
-                        {showPicker && (
+                        {userState.showPicker && (
                             <DateTimePicker
-                                value={dob || new Date()}
+                                value={userState.dob || new Date()}
                                 mode="date"
                                 display="spinner"
                                 onChange={(event, selectedDate) => {
-                                    setShowPicker(false);
+                                    dispatch({type:'showPicker', payLoad:false});
                                     if (selectedDate) {
-                                        setDob(selectedDate);
+                                        dispatch({type:'setDob', payLoad: selectedDate});
                                     }
                                 }}
                             />
