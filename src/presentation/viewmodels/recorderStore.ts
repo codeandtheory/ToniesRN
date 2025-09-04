@@ -48,6 +48,7 @@ export type RecorderActions = {
     stopPlayback: () => void;
     seekPlayback: (position: number) => void;
     clearError: () => void;
+    deleteRecording: (uri: string) => void;
 };
 
 export const useRecorderStore = create<RecorderState & RecorderActions>((set, get) => ({
@@ -236,4 +237,21 @@ export const useRecorderStore = create<RecorderState & RecorderActions>((set, ge
     },
 
     clearError: () => set({errorMessage: null}),
+
+    deleteRecording: async (uri) => {
+        try {
+            const listRecordingsUseCase = resolve<ListRecordingsUseCase>('listRecordingsUseCase');
+            const status = await listRecordingsUseCase.deleteRecording(uri)
+            if (status) {
+                const load = get().load;
+                if (load) {
+                    await load();
+                }
+            } else {
+                set({ errorMessage: "Failed to delete recording " });
+            }
+        } catch (e) {
+            set({ errorMessage: "Failed to delete recording: " + (e) });
+        }
+    }
 }));

@@ -14,4 +14,5 @@ export interface RecorderRepository {
   resumePlayback(): Promise<void>;
   stopPlayback(): Promise<void>;
   seekPlayback(position: number): Promise<void>;
+  deleteRecording(uri: string): Promise<boolean>;
 }

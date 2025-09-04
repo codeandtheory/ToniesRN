@@ -8,6 +8,7 @@ import {SeekBar} from '@/src/presentation/components/SeekBar';
 import RecordingIcon from '@/assets/images/Recordings.png';
 import {Ionicons} from '@expo/vector-icons';
 import "../../../global.css";
+import {SwipeListView} from "react-native-swipe-list-view";
 
 export default function RecorderScreen() {
     const items = useRecorderStore((s) => s.items);
@@ -33,6 +34,8 @@ export default function RecorderScreen() {
     const stopPlayback = useRecorderStore((s) => s.stopPlayback);
     const seekPlayback = useRecorderStore((s) => s.seekPlayback);
     const clearError = useRecorderStore((s) => s.clearError);
+    const deleteItem = useRecorderStore((s) => s.deleteRecording);
+
 
     const bottomInset = useBottomTabOverflow();
     const insets = useSafeAreaInsets();
@@ -182,7 +185,7 @@ export default function RecorderScreen() {
 
     return (
         <SafeAreaView className="flex-1 bg-[#F4F1ED]">
-            <FlatList
+            <SwipeListView
                 data={items}
                 keyExtractor={(item) => item.uri}
                 contentContainerStyle={[
@@ -226,7 +229,21 @@ export default function RecorderScreen() {
                         </View>
                     </TouchableOpacity>
                 )}
+                renderHiddenItem={({item}) => (
+                    <View className="flex-1 flex-row justify-end items-center mr-4">
+                        <TouchableOpacity
+                            onPress={() => deleteItem(item.uri)}
+                            className="w-16 h-20 justify-center items-center bg-[#D2000F] rounded-xl"
+                        >
+                            <Ionicons name="trash" size={28} color="#fff" />
+                            <Text className="text-white font-bold mt-1">Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                )}
+                rightOpenValue={-80}
             />
+
 
             {/* Recording Controls (hidden while modal is open) */}
             {renderRecordingControls()}

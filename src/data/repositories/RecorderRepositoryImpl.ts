@@ -170,4 +170,13 @@ export class RecorderRepositoryImpl implements RecorderRepository {
       } catch { }
     }
   }
+
+  async deleteRecording(uri: string): Promise<boolean> {
+    try {
+      await FileSystem.deleteAsync(uri, { idempotent: true });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

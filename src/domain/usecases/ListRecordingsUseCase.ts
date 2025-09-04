@@ -11,4 +11,8 @@ export class ListRecordingsUseCase {
   async execute(): Promise<RecordingItem[]> {
     return this.repo.list();
   }
+
+  async deleteRecording(uri: string): Promise<boolean> {
+    return this.repo.deleteRecording(uri)
+  }
 }
